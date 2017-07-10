@@ -1,7 +1,7 @@
 package mailer
 
-// Interface email sender interface
-type Interface interface {
+// SenderInterface sender's interface
+type SenderInterface interface {
 	Send(Email) error
 }
 
@@ -13,7 +13,7 @@ type Mailer struct {
 // Config mailer config
 type Config struct {
 	DefaultEmailTemplate *Email
-	Sender               Interface
+	Sender               SenderInterface
 }
 
 // New initialize mailer

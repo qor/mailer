@@ -12,8 +12,10 @@ type Email struct {
 	Subject       string
 	Headers       mail.Header
 	Attachments   []Attachment
-	Template      string // template name
-	Layout        string // application
+	Layout        string // application name
+	Template      string // email's template name
+	Text          string // text email content
+	HTML          string // html email content
 }
 
 // Attachment attachment struct
@@ -74,6 +76,14 @@ func (email Email) Merge(e Email) Email {
 
 	if e.Layout != "" {
 		email.Layout = e.Layout
+	}
+
+	if e.Text != "" {
+		email.Text = e.Text
+	}
+
+	if e.HTML != "" {
+		email.HTML = e.HTML
 	}
 
 	return email
