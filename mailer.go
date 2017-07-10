@@ -1,25 +1,22 @@
 package mailer
 
-import (
-	"io"
-	"net/mail"
-)
-
+// Interface email sender interface
 type Interface interface {
 	Send(Email) error
 }
 
+// Mailer mailer struct
 type Mailer struct {
 	*Config
 }
 
+// Config mailer config
 type Config struct {
-	DefaultFrom    *mail.Address
-	DefaultReplyTo *mail.Address
-	DefaultTo      []mail.Address
-	Sender         Interface
+	DefaultEmailTemplate *Email
+	Sender               Interface
 }
 
+// New initialize mailer
 func New(config *Config) *Mailer {
 	if config == nil {
 		config = &Config{}
@@ -28,34 +25,7 @@ func New(config *Config) *Mailer {
 	return &Mailer{config}
 }
 
+// Send send email
 func (mailer Mailer) Send(email Email) error {
-	if len(email.TO) == 0 {
-		email.TO = mailer.Config.DefaultTo
-	}
-
-	if email.From == nil {
-		email.From = mailer.Config.DefaultFrom
-	}
-
-	if email.ReplyTo == nil {
-		email.ReplyTo = mailer.Config.DefaultReplyTo
-	}
-
-	return mailer.Sender.Send(email)
-}
-
-type Email struct {
-	TO, CC, BCC   []mail.Address
-	From, ReplyTo *mail.Address
-	Subject       string
-	Headers       mail.Header
-	Attachments   []Attachment
-	Template      string // template name
-}
-
-type Attachment struct {
-	FileName string
-	Inline   bool
-	MimeType string
-	Content  io.Reader
+	return mailer.Sender.Send(mailer.DefaultEmailTemplate.Merge(email))
 }
