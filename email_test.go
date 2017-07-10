@@ -137,5 +137,26 @@ func TestEmailMerge(t *testing.T) {
 		t.Errorf("Email should not be changed when use Mergei, got %v", err)
 	}
 
-	fmt.Printf("%+v \n", email3)
+	generatedEmail := mailer.Email{
+		TO:      []mail.Address{{Address: "to1@example.org"}},
+		CC:      []mail.Address{{Address: "cc2@example.org"}},
+		BCC:     []mail.Address{{Address: "bcc1@example.org"}},
+		From:    &mail.Address{Address: "from1@example.org"},
+		ReplyTo: &mail.Address{Address: "reply2@example.org"},
+		Subject: "subject",
+		Headers: mail.Header{"Key1": []string{"Value1"}, "Key2": []string{"Value2"}},
+		Attachments: []mailer.Attachment{
+			{
+				FileName: "logo2.png",
+				Inline:   true,
+				MimeType: "image/png",
+				Content:  nil,
+			},
+		},
+		Template: "template1",
+		Layout:   "layout2",
+	}
+	if err := equalCheck(email3, generatedEmail); err != nil {
+		t.Errorf("Generated email with Merge should be correct, but got %v", err)
+	}
 }

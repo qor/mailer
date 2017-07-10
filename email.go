@@ -38,19 +38,30 @@ func (email Email) Merge(e Email) Email {
 		email.BCC = e.BCC
 	}
 
-	if e.From == nil {
+	if e.From != nil {
 		email.From = e.From
 	}
 
-	if e.ReplyTo == nil {
+	if e.ReplyTo != nil {
 		email.ReplyTo = e.ReplyTo
 	}
 
 	if e.Subject != "" {
 		email.Subject = e.Subject
 	}
+
 	if e.Headers != nil {
-		email.Headers = e.Headers
+		newHeaders := mail.Header{}
+
+		for k, v := range email.Headers {
+			newHeaders[k] = v
+		}
+
+		for k, v := range e.Headers {
+			newHeaders[k] = v
+		}
+
+		email.Headers = newHeaders
 	}
 
 	if len(e.Attachments) > 0 {
