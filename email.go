@@ -1,9 +1,6 @@
 package mailer
 
-import (
-	"io"
-	"net/mail"
-)
+import "net/mail"
 
 // Email email struct
 type Email struct {
@@ -22,8 +19,6 @@ type Email struct {
 type Attachment struct {
 	FileName string
 	Inline   bool
-	MimeType string
-	Content  io.Reader
 }
 
 // Merge merge email struct and create a new one
