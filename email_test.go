@@ -74,13 +74,13 @@ func equalCheck(email1, email2 mailer.Email) error {
 		}
 	}
 
-	if email1.Template != email2.Template {
-		return fmt.Errorf("Email's Template should be same, but got %v, %v", email1.Template, email2.Template)
-	}
+	// if email1.Template != email2.Template {
+	// 	return fmt.Errorf("Email's Template should be same, but got %v, %v", email1.Template, email2.Template)
+	// }
 
-	if email1.Layout != email2.Layout {
-		return fmt.Errorf("Email's Layout should be same, but got %v, %v", email1.Layout, email2.Layout)
-	}
+	// if email1.Layout != email2.Layout {
+	// 	return fmt.Errorf("Email's Layout should be same, but got %v, %v", email1.Layout, email2.Layout)
+	// }
 
 	if email1.Text != email2.Text {
 		return fmt.Errorf("Email's Text should be same, but got %v, %v", email1.Text, email2.Text)
@@ -105,11 +105,9 @@ func TestEmailMerge(t *testing.T) {
 			{
 				FileName: "logo.png",
 				Inline:   true,
-				MimeType: "image/png",
-				Content:  nil,
 			},
 		},
-		Template: "template1",
+		// Template: "template1",
 		// Layout:      "layout",
 		Text: "text1",
 	}
@@ -127,13 +125,11 @@ func TestEmailMerge(t *testing.T) {
 			{
 				FileName: "logo2.png",
 				Inline:   true,
-				MimeType: "image/png",
-				Content:  nil,
 			},
 		},
 		// Template: "template2",
-		Layout: "layout2",
-		HTML:   "html2",
+		// Layout: "layout2",
+		HTML: "html2",
 	}
 	email2Clone := email2
 
@@ -159,14 +155,12 @@ func TestEmailMerge(t *testing.T) {
 			{
 				FileName: "logo2.png",
 				Inline:   true,
-				MimeType: "image/png",
-				Content:  nil,
 			},
 		},
-		Template: "template1",
-		Layout:   "layout2",
-		Text:     "text1",
-		HTML:     "html2",
+		// Template: "template1",
+		// Layout:   "layout2",
+		Text: "text1",
+		HTML: "html2",
 	}
 	if err := equalCheck(email3, generatedEmail); err != nil {
 		t.Errorf("Generated email with Merge should be correct, but got %v", err)

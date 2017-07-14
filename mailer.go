@@ -42,11 +42,5 @@ func New(config *Config) *Mailer {
 func (mailer Mailer) Send(email Email) error {
 	email = mailer.DefaultEmailTemplate.Merge(email)
 
-	if email.Text == "" && email.HTML == "" && email.Template != "" {
-		// render Text template
-
-		// render HTML template
-	}
-
 	return mailer.Sender.Send(email)
 }
