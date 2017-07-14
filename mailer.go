@@ -1,6 +1,9 @@
 package mailer
 
-import "github.com/qor/assetfs"
+import (
+	"github.com/qor/assetfs"
+	"github.com/qor/render"
+)
 
 // SenderInterface sender's interface
 type SenderInterface interface {
@@ -17,6 +20,7 @@ type Config struct {
 	DefaultEmailTemplate *Email
 	AssetFS              assetfs.Interface
 	Sender               SenderInterface
+	*render.Render
 }
 
 // New initialize mailer
@@ -31,6 +35,11 @@ func New(config *Config) *Mailer {
 
 	config.AssetFS.RegisterPath("app/views/mailers")
 
+	if config.Render == nil {
+		config.Render = render.New()
+		config.Render.SetAssetFS(config.AssetFS)
+	}
+
 	return &Mailer{config}
 }
 
@@ -43,6 +52,9 @@ func (mailer Mailer) Send(email Email, templates ...Template) error {
 	}
 
 	for _, template := range templates {
-		return mailer.Sender.Send(mailer.Render(template).Merge(email))
+		if err := mailer.Sender.Send(mailer.Render(template).Merge(email)); err != nil {
+			return err
+		}
 	}
+	return nil
 }
