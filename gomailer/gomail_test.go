@@ -1,8 +1,10 @@
 package gomailer_test
 
 import (
+	"bytes"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net/mail"
 	"testing"
 
@@ -22,6 +24,8 @@ var Config = struct {
 	Password string `env:"SMTP_Password"`
 }{}
 
+var Box bytes.Buffer
+
 func init() {
 	configor.Load(&Config)
 
@@ -33,6 +37,12 @@ func init() {
 	}
 
 	sender := gomailer.New(&gomailer.Config{Sender: dailer})
+	gomail.SendFunc(gomail.SendFunc(func(from string, to []string, msg io.WriterTo) error {
+		Box.WriteString("From:", from)
+		Box.WriteString("To:", to)
+		_, err := msg.WriteTo(Box)
+		return err
+	}))
 
 	Mailer = mailer.New(&mailer.Config{
 		Sender: sender,
