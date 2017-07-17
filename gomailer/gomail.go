@@ -1,4 +1,4 @@
-package gomail
+package gomailer
 
 import (
 	"github.com/qor/mailer"

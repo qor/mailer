@@ -45,7 +45,9 @@ func New(config *Config) *Mailer {
 
 // Send send email
 func (mailer Mailer) Send(email Email, templates ...Template) error {
-	email = mailer.DefaultEmailTemplate.Merge(email)
+	if mailer.DefaultEmailTemplate != nil {
+		email = mailer.DefaultEmailTemplate.Merge(email)
+	}
 
 	if len(templates) == 0 {
 		return mailer.Sender.Send(email)
