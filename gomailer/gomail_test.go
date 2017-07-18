@@ -19,7 +19,7 @@ import (
 var Mailer *mailer.Mailer
 
 var Config = struct {
-	SendRealEmail bool
+	SendRealEmail bool   `env:"DEBUG"`
 	Address       string `env:"SMTP_Address"`
 	Port          int    `env:"SMTP_Port"`
 	User          string `env:"SMTP_User"`
@@ -33,7 +33,7 @@ var Box bytes.Buffer
 func init() {
 	configor.Load(&Config)
 
-	if Config.SendRealEmail || true {
+	if Config.SendRealEmail {
 		d := gomail.NewDialer(Config.Address, Config.Port, Config.User, Config.Password)
 		d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 		sender, err := d.Dial()
@@ -63,7 +63,7 @@ func TestSendEmail(t *testing.T) {
 		TO:          []mail.Address{{Address: Config.DefaultTo}},
 		From:        &mail.Address{Address: Config.DefaultFrom},
 		Text:        "text email",
-		HTML:        "html email <img src='../test/logo.png'/>",
+		HTML:        "html email <img src='cid:logo.png'/>",
 		Attachments: []mailer.Attachment{{FileName: "gomail.go"}, {FileName: "../test/logo.png", Inline: true}},
 	})
 
