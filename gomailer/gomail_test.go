@@ -24,6 +24,8 @@ var Config = struct {
 	Port          int    `env:"SMTP_Port"`
 	User          string `env:"SMTP_User"`
 	Password      string `env:"SMTP_Password"`
+	DefaultTo     string `env:"SMTP_TO" default:"jinzhu@example.org"`
+	DefaultFrom   string `env:"SMTP_From" default:"from@example.org"`
 }{}
 
 var Box bytes.Buffer
@@ -31,7 +33,7 @@ var Box bytes.Buffer
 func init() {
 	configor.Load(&Config)
 
-	if Config.SendRealEmail {
+	if Config.SendRealEmail || true {
 		d := gomail.NewDialer(Config.Address, Config.Port, Config.User, Config.Password)
 		d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
 		sender, err := d.Dial()
@@ -44,8 +46,8 @@ func init() {
 		})
 	} else {
 		sender := gomail.SendFunc(gomail.SendFunc(func(from string, to []string, msg io.WriterTo) error {
-			Box.WriteString("From: " + from)
-			Box.WriteString("To: " + strings.Join(to, ", "))
+			Box.WriteString(fmt.Sprintf("From: %v\n", from))
+			Box.WriteString(fmt.Sprintf("To: %v\n", strings.Join(to, ", ")))
 			_, err := msg.WriteTo(&Box)
 			return err
 		}))
@@ -58,13 +60,16 @@ func init() {
 
 func TestSendEmail(t *testing.T) {
 	err := Mailer.Send(mailer.Email{
-		TO:   []mail.Address{{Address: "jinzhu@example.org"}},
-		From: &mail.Address{Address: "from@example.org"},
-		Text: "text email",
+		TO:          []mail.Address{{Address: Config.DefaultTo}},
+		From:        &mail.Address{Address: Config.DefaultFrom},
+		Text:        "text email",
+		HTML:        "html email <img src='../test/logo.png'/>",
+		Attachments: []mailer.Attachment{{FileName: "gomail.go"}, {FileName: "../test/logo.png", Inline: true}},
 	})
 
 	if err != nil {
 		t.Errorf("No error should raise when send email")
 	}
-	t.Errorf("hello world")
+
+	fmt.Println(Box.String())
 }
