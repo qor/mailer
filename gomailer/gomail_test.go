@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/mail"
+	"strings"
 	"testing"
 
 	gomail "gopkg.in/gomail.v2"
@@ -18,10 +19,11 @@ import (
 var Mailer *mailer.Mailer
 
 var Config = struct {
-	Address  string `env:"SMTP_Address"`
-	Port     int    `env:"SMTP_Port"`
-	User     string `env:"SMTP_User"`
-	Password string `env:"SMTP_Password"`
+	SendRealEmail bool
+	Address       string `env:"SMTP_Address"`
+	Port          int    `env:"SMTP_Port"`
+	User          string `env:"SMTP_User"`
+	Password      string `env:"SMTP_Password"`
 }{}
 
 var Box bytes.Buffer
@@ -29,24 +31,29 @@ var Box bytes.Buffer
 func init() {
 	configor.Load(&Config)
 
-	d := gomail.NewDialer(Config.Address, Config.Port, Config.User, Config.Password)
-	d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
-	dailer, err := d.Dial()
-	if err != nil {
-		panic(fmt.Sprintf("Got error %v when dail mail server: %#v", err, Config))
+	if Config.SendRealEmail {
+		d := gomail.NewDialer(Config.Address, Config.Port, Config.User, Config.Password)
+		d.TLSConfig = &tls.Config{InsecureSkipVerify: true}
+		sender, err := d.Dial()
+		if err != nil {
+			panic(fmt.Sprintf("Got error %v when dail mail server: %#v", err, Config))
+		}
+
+		Mailer = mailer.New(&mailer.Config{
+			Sender: gomailer.New(&gomailer.Config{Sender: sender}),
+		})
+	} else {
+		sender := gomail.SendFunc(gomail.SendFunc(func(from string, to []string, msg io.WriterTo) error {
+			Box.WriteString("From: " + from)
+			Box.WriteString("To: " + strings.Join(to, ", "))
+			_, err := msg.WriteTo(&Box)
+			return err
+		}))
+
+		Mailer = mailer.New(&mailer.Config{
+			Sender: gomailer.New(&gomailer.Config{Sender: sender}),
+		})
 	}
-
-	sender := gomailer.New(&gomailer.Config{Sender: dailer})
-	gomail.SendFunc(gomail.SendFunc(func(from string, to []string, msg io.WriterTo) error {
-		Box.WriteString("From:", from)
-		Box.WriteString("To:", to)
-		_, err := msg.WriteTo(Box)
-		return err
-	}))
-
-	Mailer = mailer.New(&mailer.Config{
-		Sender: sender,
-	})
 }
 
 func TestSendEmail(t *testing.T) {
