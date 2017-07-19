@@ -94,3 +94,22 @@ func TestSendEmailWithLayout(t *testing.T) {
 
 	fmt.Println(Box.String())
 }
+
+func TestSendEmailWithMissingLayout(t *testing.T) {
+	Box = bytes.Buffer{}
+
+	err := Mailer.Send(
+		mailer.Email{
+			TO:      []mail.Address{{Address: Config.DefaultTo}},
+			From:    &mail.Address{Address: Config.DefaultFrom},
+			Subject: "hello",
+		},
+		mailer.Template{Name: "template_with_missing_layout", Layout: "html_layout"},
+	)
+
+	if err != nil {
+		t.Errorf("No error should raise when send email")
+	}
+
+	fmt.Println(Box.String())
+}
