@@ -59,6 +59,8 @@ func init() {
 }
 
 func TestSendEmail(t *testing.T) {
+	Box = bytes.Buffer{}
+
 	err := Mailer.Send(mailer.Email{
 		TO:          []mail.Address{{Address: Config.DefaultTo}},
 		From:        &mail.Address{Address: Config.DefaultFrom},
@@ -66,6 +68,25 @@ func TestSendEmail(t *testing.T) {
 		HTML:        "html email <img src='cid:logo.png'/>",
 		Attachments: []mailer.Attachment{{FileName: "gomail.go"}, {FileName: "../test/logo.png", Inline: true}},
 	})
+
+	if err != nil {
+		t.Errorf("No error should raise when send email")
+	}
+
+	fmt.Println(Box.String())
+}
+
+func TestSendEmailWithLayout(t *testing.T) {
+	Box = bytes.Buffer{}
+
+	err := Mailer.Send(
+		mailer.Email{
+			TO:      []mail.Address{{Address: Config.DefaultTo}},
+			From:    &mail.Address{Address: Config.DefaultFrom},
+			Subject: "hello",
+		},
+		mailer.Template{Name: "template", Layout: "application"},
+	)
 
 	if err != nil {
 		t.Errorf("No error should raise when send email")
