@@ -69,12 +69,12 @@ func (sender *Sender) Send(email mailer.Email) error {
 
 	m.SetHeader("Subject", email.Subject)
 
-	if email.HTML != "" {
-		m.AddAlternative("text/html", email.HTML)
-	}
-
 	if email.Text != "" {
 		m.AddAlternative("text/plain", email.Text)
+	}
+
+	if email.HTML != "" {
+		m.AddAlternative("text/html", email.HTML)
 	}
 
 	for _, attachment := range email.Attachments {
