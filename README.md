@@ -34,9 +34,9 @@ Mailer.Send(mailer.Email{
 
 Mailer is using [Render](github.com/qor/render) to render email templates and layouts, please refer it for How-To.
 
-Emails could have HTML and text version, it will use template `hello.html.tmpl` with layout `application.html.tmpl` as the HTML version, `hello.text.tmpl` with layout `application.text.tmpl` as the text version, if we don't have the layout file, we will use template's content for the email, if we don't have the template, we will skip that email version.
-
-Templates and layouts are located in `app/views/mailers`, which could be customized it with Mailer's AssetFS.
+Emails could have HTML and text version, when sending emails,
+It will look up template `hello.html.tmpl` and layout `application.html.tmpl` from view paths, and render it as HTML version's content, and use template `hello.text.tmpl` and layout `application.text.tmpl` as text version's content.
+If we haven't find the layout file, we will only render template's as the content, and if we don't have the template, we will just skip that version, for example, if `hello.text.tmpl` doesn't exist, we will only send the HTML version.
 
 ```go
 Mailer.Send(
@@ -47,4 +47,20 @@ Mailer.Send(
 	},
 	mailer.Template{Name: "hello", Layout: "application", Data: currentUser},
 )
+```
+
+Templates and layouts are located in `app/views/mailers`, which could be customized it with Mailer's AssetFS.
+
+```go
+import "github.com/qor/assetfs"
+
+func main() {
+	assetFS := assetfs.AssetFS().NameSpace("mailer")
+	assetFS.RegisterPath("mailers/views")
+
+	Mailer := mailer.New(&mailer.Config{
+		Sender: gomailer.New(&gomailer.Config{Sender: sender}),
+		AssetFS: assetFS,
+	})
+}
 ```
