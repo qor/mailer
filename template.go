@@ -3,6 +3,7 @@ package mailer
 import (
 	"html/template"
 	"net/http"
+	"net/url"
 )
 
 // Template email template
@@ -24,6 +25,22 @@ func (tmpl Template) Funcs(funcMap template.FuncMap) Template {
 // Render render template
 func (mailer Mailer) Render(t Template) Email {
 	var email Email
+
+	if t.funcMap == nil {
+		t.funcMap = template.FuncMap{}
+	}
+
+	if _, ok := t.funcMap["root_url"]; !ok {
+		t.funcMap["root_url"] = func() string {
+			if t.Request != nil && t.Request.URL != nil {
+				var newURL url.URL
+				newURL.Host = t.Request.URL.Host
+				newURL.Scheme = t.Request.URL.Scheme
+				return newURL.String()
+			}
+			return ""
+		}
+	}
 
 	if t.Layout != "" {
 		if result, err := mailer.Config.Render.Layout(t.Layout+".text").Funcs(t.funcMap).Render(t.Name+".text", t.Data, t.Request, t.Writer); err == nil {
