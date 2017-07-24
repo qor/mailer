@@ -16,7 +16,7 @@ type Template struct {
 }
 
 // Funcs set template's funcs
-func (tmpl *Template) Funcs(funcMap template.FuncMap) *Template {
+func (tmpl Template) Funcs(funcMap template.FuncMap) Template {
 	tmpl.funcMap = funcMap
 	return tmpl
 }
