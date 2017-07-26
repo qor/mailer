@@ -56,6 +56,8 @@ func init() {
 			Sender: gomailer.New(&gomailer.Config{Sender: sender}),
 		})
 	}
+
+	Mailer.RegisterViewPath("tests/app/views/mailers")
 }
 
 func TestSendEmail(t *testing.T) {
