@@ -36,21 +36,32 @@ func (sender *Sender) Send(email mailer.Email) error {
 	formatAddress := func(key string, addresses []mail.Address) {
 		var emails []string
 
-		result.WriteString(fmt.Sprintf("%v: ", key))
+		if len(addresses) > 0 {
+			result.WriteString(fmt.Sprintf("%v: ", key))
 
-		for _, address := range addresses {
-			emails = append(emails, address.String())
+			for _, address := range addresses {
+				emails = append(emails, address.String())
+			}
+
+			result.WriteString(strings.Join(emails, ", ") + "\n")
 		}
-
-		result.WriteString(strings.Join(emails, ", ") + "\n")
 	}
 
 	formatAddress("TO", email.TO)
 	formatAddress("CC", email.CC)
 	formatAddress("BCC", email.BCC)
-	formatAddress("From", []mail.Address{*email.From})
-	formatAddress("ReplyTO", []mail.Address{*email.ReplyTo})
-	result.WriteString(fmt.Sprintf("Subject: %v\n", email.Subject))
+
+	if email.From != nil {
+		formatAddress("From", []mail.Address{*email.From})
+	}
+
+	if email.ReplyTo != nil {
+		formatAddress("ReplyTO", []mail.Address{*email.ReplyTo})
+	}
+
+	if email.Subject != "" {
+		result.WriteString(fmt.Sprintf("Subject: %v\n", email.Subject))
+	}
 
 	if email.Headers != nil {
 		for key, value := range email.Headers {
