@@ -85,5 +85,6 @@ func (sender *Sender) Send(email mailer.Email) error {
 		result.WriteString(fmt.Sprintf("\nContent-Type: text/html; charset=UTF-8\n%v\n", email.HTML))
 	}
 
+	fmt.Println(result.String())
 	return nil
 }
