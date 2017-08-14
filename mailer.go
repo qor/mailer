@@ -36,8 +36,7 @@ func New(config *Config) *Mailer {
 	config.AssetFS.RegisterPath("app/views/mailers")
 
 	if config.Render == nil {
-		config.Render = render.New()
-		config.Render.IgnoreLayoutError = true
+		config.Render = render.New(nil)
 		config.Render.SetAssetFS(config.AssetFS)
 	}
 
