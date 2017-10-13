@@ -12,7 +12,7 @@ type Sender struct {
 
 // Config gomail config
 type Config struct {
-	Sender gomail.Sender
+	Dialer *gomail.Dialer
 }
 
 // New initalize gomail sender with gomail.Dailer
@@ -85,5 +85,5 @@ func (sender *Sender) Send(email mailer.Email) error {
 		}
 	}
 
-	return gomail.Send(sender.Sender, m)
+	return sender.Dialer.DialAndSend(m)
 }
