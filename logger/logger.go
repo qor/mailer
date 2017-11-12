@@ -14,6 +14,8 @@ import (
 // Sender gomail struct
 type Sender struct {
 	*Config
+
+	Sent []*mailer.Email
 }
 
 // Config gomail config
@@ -90,6 +92,7 @@ func (sender *Sender) Send(email mailer.Email) error {
 		fmt.Fprintf(result, "\nContent-Type: text/html; charset=UTF-8\n%v\n", email.HTML)
 	}
 
+	sender.Sent = append(sender.Sent, &email)
 	_, err := io.Copy(sender.output, result)
 	return err
 }
