@@ -3,7 +3,9 @@ package logger
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"net/mail"
+	"os"
 	"strings"
 
 	"github.com/qor/mailer"
@@ -15,12 +17,18 @@ type Sender struct {
 }
 
 // Config gomail config
-type Config struct{}
+type Config struct {
+	output io.Writer
+}
 
 // New initalize gomail sender with gomail.Dailer
 func New(config *Config) *Sender {
 	if config == nil {
 		config = &Config{}
+	}
+
+	if config.output == nil {
+		config.output = os.Stderr
 	}
 
 	return &Sender{Config: config}
@@ -82,6 +90,6 @@ func (sender *Sender) Send(email mailer.Email) error {
 		fmt.Fprintf(result, "\nContent-Type: text/html; charset=UTF-8\n%v\n", email.HTML)
 	}
 
-	fmt.Println(result.String())
-	return nil
+	_, err := io.Copy(sender.output, result)
+	return err
 }
