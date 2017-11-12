@@ -7,7 +7,6 @@ import (
 	"strings"
 
 	"github.com/qor/mailer"
-	gomail "gopkg.in/gomail.v2"
 )
 
 // Sender gomail struct
@@ -16,9 +15,7 @@ type Sender struct {
 }
 
 // Config gomail config
-type Config struct {
-	Sender gomail.Sender
-}
+type Config struct{}
 
 // New initalize gomail sender with gomail.Dailer
 func New(config *Config) *Sender {
