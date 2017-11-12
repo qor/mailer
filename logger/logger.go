@@ -20,7 +20,7 @@ type Sender struct {
 
 // Config gomail config
 type Config struct {
-	output io.Writer
+	Output io.Writer
 }
 
 // New initalize gomail sender with gomail.Dailer
@@ -29,8 +29,8 @@ func New(config *Config) *Sender {
 		config = &Config{}
 	}
 
-	if config.output == nil {
-		config.output = os.Stderr
+	if config.Output == nil {
+		config.Output = os.Stderr
 	}
 
 	return &Sender{Config: config}
@@ -93,6 +93,6 @@ func (sender *Sender) Send(email mailer.Email) error {
 	}
 
 	sender.Sent = append(sender.Sent, &email)
-	_, err := io.Copy(sender.output, result)
+	_, err := io.Copy(sender.Output, result)
 	return err
 }
