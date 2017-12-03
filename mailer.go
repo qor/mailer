@@ -1,6 +1,7 @@
 package mailer
 
 import (
+	"github.com/pkg/errors"
 	"github.com/qor/assetfs"
 	"github.com/qor/render"
 )
@@ -24,7 +25,7 @@ type Config struct {
 }
 
 // New initialize mailer
-func New(config *Config) *Mailer {
+func New(config *Config) (*Mailer, error) {
 	if config == nil {
 		config = &Config{}
 	}
@@ -33,14 +34,16 @@ func New(config *Config) *Mailer {
 		config.AssetFS = assetfs.AssetFS().NameSpace("mailer")
 	}
 
-	config.AssetFS.RegisterPath("app/views/mailers")
+	if err := config.AssetFS.RegisterPath("app/views/auth/mail"); err != nil {
+		return nil, errors.Wrap(err, "Mailer: could not registerPath")
+	}
 
 	if config.Render == nil {
 		config.Render = render.New(nil)
 		config.Render.SetAssetFS(config.AssetFS)
 	}
 
-	return &Mailer{config}
+	return &Mailer{config}, nil
 }
 
 // Send send email
@@ -53,9 +56,13 @@ func (mailer Mailer) Send(email Email, templates ...Template) error {
 		return mailer.Sender.Send(email)
 	}
 
-	for _, template := range templates {
-		if err := mailer.Sender.Send(mailer.Render(template).Merge(email)); err != nil {
-			return err
+	for i, template := range templates {
+		m, err := mailer.Render(template)
+		if err != nil {
+			return errors.Wrapf(err, "failed to render email template(%d): %s", i, template.Name)
+		}
+		if err := mailer.Sender.Send(m.Merge(email)); err != nil {
+			return errors.Wrapf(err, "failed to send email template(%d): %s", i, template.Name)
 		}
 	}
 	return nil
