@@ -9,8 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	gomail "gopkg.in/gomail.v2"
-
+	"github.com/go-gomail/gomail"
 	"github.com/jinzhu/configor"
 	"github.com/qor/mailer"
 	"github.com/qor/mailer/gomailer"

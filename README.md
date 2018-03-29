@@ -14,7 +14,7 @@ Here is how to use [gomail](https://github.com/go-gomail/gomail) to send emails
 import (
 	"github.com/qor/mailer"
 	"github.com/qor/mailer/gomailer"
-	gomail "gopkg.in/gomail.v2"
+	"github.com/go-gomail/gomail"
 )
 
 func main() {

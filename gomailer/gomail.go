@@ -1,8 +1,8 @@
 package gomailer
 
 import (
+	"github.com/go-gomail/gomail"
 	"github.com/qor/mailer"
-	gomail "gopkg.in/gomail.v2"
 )
 
 // Sender gomail struct
